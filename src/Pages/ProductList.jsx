@@ -24,6 +24,9 @@ import Layout from "../Components/Layout/Layout";
 import { Api, getProductsList, UpdateProduct } from "../actions/product";
 import axios from "axios";
 import { AppContext } from "../Contex";
+import { getTranslation } from "../actions/translations";
+import { actionTypes } from "../helper";
+import { getTranslationText } from "./utils/translations";
 
 
 const ResponsiveButton = styled(Button)(({ theme }) => ({
@@ -48,7 +51,10 @@ function ProductList() {
   const [products, setProducts] = React.useState({rows:[]});
   const [page, setPage] = React.useState(1);  // For pagination
   const [loading, setLoading] = React.useState(false);
-  const { dispatch } = React.useContext(AppContext); 
+  const { dispatch, state } = React.useContext(AppContext); 
+  const getText = getTranslationText(state, actionTypes.PRODUCT_LISTING)
+  const [language, setLanguage] = React.useState(sessionStorage.getItem('lang') || 'en');
+  
 
   React.useEffect(() => {
     const fetchProducts = async () => {
@@ -61,6 +67,7 @@ function ProductList() {
       }
       setLoading(false);
     };
+    getTranslation(dispatch, state)({page:actionTypes.PRODUCT_LISTING, lang: language})
     
     fetchProducts();
   }, [page]);  // Fetch products whenever the page changes
@@ -82,7 +89,7 @@ function ProductList() {
         <Grid item  xs={12} sm={4}>
           <TextField
             fullWidth
-            placeholder="Search Article No ..."
+            placeholder={getText("searchArticleNo")}
             size="small"
             InputProps={{
               endAdornment: <SearchIcon color="primary" />,
@@ -92,7 +99,7 @@ function ProductList() {
         <Grid item xs={12} sm={4}>
           <TextField
             fullWidth
-            placeholder="Search Product ..."
+            placeholder={getText("searchArticleNo")}
             size="small"
             InputProps={{
               endAdornment: <SearchIcon color="primary" />,
@@ -111,17 +118,17 @@ function ProductList() {
             startIcon={<AddCircleOutlineIcon />}
             sx={{ marginRight: 1 }}
           >
-            <span className="button-text">Add</span>
+            <span className="button-text">{getText("add")}</span>
           </ResponsiveButton>
             <ResponsiveButton color="primary" variant="outlined" startIcon={<PrintIcon />}>
-                <span className="button-text">Print</span>
+                <span className="button-text">{getText("print")}</span>
             </ResponsiveButton>
           <ResponsiveButton
             variant="outlined"
             color="primary"
             startIcon={<ToggleOnIcon />}
           >
-             <span className="button-text">Toggle</span>
+             <span className="button-text">{getText("toggle")}</span>
           </ResponsiveButton>
         </Grid>
       </Grid>
@@ -134,12 +141,12 @@ function ProductList() {
             <TableHead>
               <TableRow>
                 <TableCell></TableCell>
-                <TableCell>Article No.</TableCell>
-                <TableCell>Product/Service</TableCell>
-                <TableCell>Price</TableCell>
-                <TableCell>In Stock</TableCell>
-                <TableCell>Unit</TableCell>
-                <TableCell>Options</TableCell>
+                <TableCell>{getText("articleNo")}</TableCell>
+                <TableCell>{getText("productService")}</TableCell>
+                <TableCell>{getText("price")}</TableCell>
+                <TableCell>{getText("inStock")}</TableCell>
+                <TableCell>{getText("unit")}</TableCell>
+                <TableCell>{getText("options")}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -150,8 +157,8 @@ function ProductList() {
           </Table>
         </TableContainer>
          <Box sx={{ marginTop: 2, display: 'flex', justifyContent: 'space-between' }}>
-          <Button disabled={page === 1} onClick={handlePrevPage}>Previous</Button>
-          <Button onClick={handleNextPage}>Next</Button>
+          <Button disabled={page === 1} onClick={handlePrevPage}>{getText("previous")}</Button>
+          <Button onClick={handleNextPage}>{getText("next")}</Button>
         </Box>
       </Box>
     </Layout>
@@ -160,8 +167,9 @@ function ProductList() {
 
 
 const ProductRow = ({row}) =>{
-    const { dispatch } = React.useContext(AppContext); 
     const [formData, setFormData] = React.useState({ ...row });
+    const { dispatch, state } = React.useContext(AppContext); 
+    const getText = getTranslationText(state, actionTypes.PRODUCT_LISTING)
 
   const handleChange = (field, value) => {
     setFormData(prev => ({
@@ -214,7 +222,7 @@ const ProductRow = ({row}) =>{
                         size="small"
                         onClick={handleSave}
                     >
-                        Save
+                        {getText("save")}
                     </Button>
                   </TableCell>
                 </TableRow>

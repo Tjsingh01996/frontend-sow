@@ -21,24 +21,31 @@ import InventoryIcon from "@mui/icons-material/Inventory";
 import GroupIcon from "@mui/icons-material/Group";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import LogoutIcon from "@mui/icons-material/Logout";
+import { getTranslationText } from "../../Pages/utils/translations";
+import { actionTypes } from "../../helper";
+import { AppContext } from "../../Contex";
 
 
 const menuItems = [
-  { text: "Invoices", icon: <DescriptionIcon /> },
-  { text: "Customers", icon: <PeopleIcon /> },
-  { text: "My Business", icon: <BusinessIcon /> },
-  { text: "Invoice Journal", icon: <JournalIcon /> },
-  { text: "Price List", icon: <LabelIcon /> },
-  { text: "Multiple Invoicing", icon: <ListAltIcon /> },
-  { text: "Unpaid Invoices", icon: <CancelIcon /> },
-  { text: "Offer", icon: <LocalOfferIcon /> },
-  { text: "Inventory Control", icon: <InventoryIcon /> },
-  { text: "Member Invoicing", icon: <GroupIcon /> },
-  { text: "Import/Export", icon: <CloudUploadIcon /> },
-  { text: "Log out", icon: <LogoutIcon /> },
+  { text: "invoices", icon: <DescriptionIcon /> },
+  { text: "customers", icon: <PeopleIcon /> },
+  { text: "myBusiness", icon: <BusinessIcon /> },
+  { text: "invoiceJournal", icon: <JournalIcon /> },
+  { text: "priceList", icon: <LabelIcon /> },
+  { text: "multipleInvoicing", icon: <ListAltIcon /> },
+  { text: "unpaidInvoices", icon: <CancelIcon /> },
+  { text: "offer", icon: <LocalOfferIcon /> },
+  { text: "inventoryControl", icon: <InventoryIcon /> },
+  { text: "memberInvoicing", icon: <GroupIcon /> },
+  { text: "importExport", icon: <CloudUploadIcon /> },
+  { text: "logout", icon: <LogoutIcon /> },
 ];
 
 const Sidebar = ({ open }) => {
+  const { state } = React.useContext(AppContext); 
+  const pageForSideBar = Object.keys(state.translation).length > 0  ? Object.keys(state.translation)[0] : actionTypes.PRODUCT_LISTING
+  const getText = getTranslationText(state, pageForSideBar)
+  
   return (
     <Box
       sx={{
@@ -53,7 +60,7 @@ const Sidebar = ({ open }) => {
       {open && (
         <>
           <Box p={2}>
-            <Typography display={"flex"} justifyContent={"center"} variant="h6" sx={{ fontWeight: "bold" }}>Menu</Typography>
+            <Typography display={"flex"} justifyContent={"center"} variant="h6" sx={{ fontWeight: "bold" }}>{getText("menu")}</Typography>
           </Box>
           <Divider />
           <List>
@@ -61,7 +68,7 @@ const Sidebar = ({ open }) => {
               <ListItem key={index} disablePadding>
                 <ListItemButton>
                   <ListItemIcon>{item.icon}</ListItemIcon>
-                  <ListItemText primary={item.text} />
+                  <ListItemText primary={getText(item.text)} />
                 </ListItemButton>
               </ListItem>
             ))}

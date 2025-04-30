@@ -2,4 +2,5 @@ export const actionTypes = {
   ALERT_SUCCESS: "ALERT_SUCCESS",
   ALERT_ERROR: "ALERT_ERROR",
   ALERT_NULL: "ALERT_NULL",
+  PRODUCT_LISTING: "productListing",
 };

@@ -1,19 +1,26 @@
 import React, { createContext } from "react";
 import { actionTypes } from "./helper";
 const initialState = {
-    alert: null
+    alert: null,
+    translation :{
+        
+    }
 }
 export const AppContext  = createContext(initialState);
-
 
 const reducer = (state, action) => {
     switch (action.type) {
         case actionTypes.ALERT_SUCCESS:
-            return { alert:{type: "success", message:action.message}  };
+            return {...state, alert:{type: "success", message:action.message}  };
         case actionTypes.ALERT_ERROR:
-            return { alert:{type: "error", message:action.message }  };
+            return {...state, alert:{type: "error", message:action.message }  };
         case actionTypes.ALERT_NULL:
-            return { alert: null };
+            return {...state, alert: null};
+        case actionTypes.PRODUCT_LISTING:
+            if(!(state.translation && state.translation.productListing)){
+                state.translation[actionTypes.PRODUCT_LISTING] = action.message
+            };
+            return state;   
         default:
             return state;
     }
