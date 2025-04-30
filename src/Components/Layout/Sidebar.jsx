@@ -22,6 +22,7 @@ import GroupIcon from "@mui/icons-material/Group";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import LogoutIcon from "@mui/icons-material/Logout";
 
+
 const menuItems = [
   { text: "Invoices", icon: <DescriptionIcon /> },
   { text: "Customers", icon: <PeopleIcon /> },

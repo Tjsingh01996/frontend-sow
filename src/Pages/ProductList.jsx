@@ -23,6 +23,7 @@ import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
 import Layout from "../Components/Layout/Layout";
 import { Api, getProductsList, UpdateProduct } from "../actions/product";
 import axios from "axios";
+import { AppContext } from "../Contex";
 
 
 const ResponsiveButton = styled(Button)(({ theme }) => ({
@@ -47,11 +48,12 @@ function ProductList() {
   const [products, setProducts] = React.useState({rows:[]});
   const [page, setPage] = React.useState(1);  // For pagination
   const [loading, setLoading] = React.useState(false);
+  const { dispatch } = React.useContext(AppContext); 
 
   React.useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
-      const response = await getProductsList(page);  // Call the API with current page
+      const response = await getProductsList(dispatch)(page);  // Call the API with current page
       if (response.success) {
         setProducts(response.result);  // Update state with the fetched products
       } else {
@@ -124,7 +126,10 @@ function ProductList() {
         </Grid>
       </Grid>
       <Box sx={{ marginTop: 4 }}>
-        <TableContainer component={Paper} elevation={0}>
+        <TableContainer component={Paper} elevation={0}   sx={{ 
+          maxHeight: 400, // or adjust height as needed
+          overflowY: 'auto' 
+        }}>
           <Table>
             <TableHead>
               <TableRow>
@@ -155,8 +160,8 @@ function ProductList() {
 
 
 const ProductRow = ({row}) =>{
-
-     const [formData, setFormData] = React.useState({ ...row });
+    const { dispatch } = React.useContext(AppContext); 
+    const [formData, setFormData] = React.useState({ ...row });
 
   const handleChange = (field, value) => {
     setFormData(prev => ({
@@ -167,7 +172,7 @@ const ProductRow = ({row}) =>{
 
   const handleSave = async () => {
     try {
-         const result = await UpdateProduct(formData.id, formData)
+         const result = await UpdateProduct(dispatch)(formData.id, formData)
       if(result.success == true){
         console.log("formData", formData)
       }else{
