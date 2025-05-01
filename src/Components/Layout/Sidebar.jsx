@@ -25,8 +25,10 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import { getTranslationText } from "../../Pages/utils/translations";
 import { actionTypes } from "../../helper";
 import { AppContext } from "../../Contex";
+import { useNavigate } from "react-router-dom";
 
 const menuItems = [
+  { text: "terms", icon: <LabelIcon />, to: "/terms" },
   { text: "invoices", icon: <DescriptionIcon /> },
   { text: "customers", icon: <PeopleIcon /> },
   { text: "myBusiness", icon: <BusinessIcon /> },
@@ -43,6 +45,7 @@ const menuItems = [
 
 const Sidebar = ({ open, permanent = false, onClose }) => {
   const { state } = React.useContext(AppContext);
+  const navigate = useNavigate()
   const pageForSideBar =
     Object.keys(state.translation).length > 0
       ? Object.keys(state.translation)[0]
@@ -65,9 +68,11 @@ const Sidebar = ({ open, permanent = false, onClose }) => {
       <List>
         {menuItems.map((item, index) => (
           <ListItem key={index} disablePadding>
-            <ListItemButton>
+            <ListItemButton onClick={() => {
+               (item.to) && navigate(item.to)
+              }} >
               <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={getText(item.text)} />
+              <ListItemText  primary={getText(item.text)} />
             </ListItemButton>
           </ListItem>
         ))}

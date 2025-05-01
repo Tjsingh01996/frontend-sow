@@ -14,6 +14,7 @@ import { getTranslation } from "../actions/translations";
 import { AppContext } from "../Contex";
 import { actionTypes } from "../helper";
 import { getTranslationText } from "./utils/translations";
+import LanguageSelector from "../Components/TermPageDropDown";
 
 const GoBackButton = styled(Button)(({ theme }) => ({
   fontSize: '1.125em',
@@ -34,14 +35,13 @@ const GoBackButton = styled(Button)(({ theme }) => ({
       
 
 const TermsPage = () => {
-    const { dispatch, state } = React.useContext(AppContext); 
     const [language, setLanguage] = React.useState(sessionStorage.getItem('lang') || 'en');
-    
+    const { dispatch, state } = React.useContext(AppContext); 
     const getText = getTranslationText(state, actionTypes.TERMS); 
 
     React.useEffect(()=>{
         getTranslation(dispatch, state)({page:actionTypes.TERMS, lang: language})
-    },[dispatch, language, state]) 
+    },[ language]) 
 
   return (
     <Box
@@ -92,14 +92,10 @@ const TermsPage = () => {
               {getText("menu_contact")}
             </Link>
             <Link href="#" underline="none" color="white">
-           
                {getText("menu_language")}
             </Link>
-            <img
-              src="https://upload.wikimedia.org/wikipedia/en/a/ae/Flag_of_the_United_Kingdom.svg"
-              alt="English"
-              style={{ width: 24, height: 16 }}
-            />
+            <LanguageSelector />
+            
           </Box>
         </Toolbar>
       </AppBar>
