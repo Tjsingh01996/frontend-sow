@@ -1,20 +1,19 @@
 import React from "react";
-import {
-  Alert,
-    Box,
-    Fade
-} from "@mui/material";
+import { Alert, Box, Fade, useMediaQuery, useTheme } from "@mui/material";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 import { AppContext } from "../../Contex";
 import { actionTypes } from "../../helper";
 
-function SuccessAlert({message, severity="success" }) {
-  const { state:{ alert },  dispatch } = React.useContext(AppContext); 
+function SuccessAlert({ message, severity = "success" }) {
+  const {
+    state: { alert },
+    dispatch,
+  } = React.useContext(AppContext);
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
-       dispatch({type: actionTypes.ALERT_NULL});
+      dispatch({ type: actionTypes.ALERT_NULL });
     }, 3000); // hides after 3 seconds
 
     return () => clearTimeout(timer); // cleanup
@@ -22,35 +21,68 @@ function SuccessAlert({message, severity="success" }) {
 
   return (
     <Fade
-      in={!!(alert)}
+      in={!!alert}
       appear={true}
       timeout={{ enter: 1000, exit: 500 }}
-      easing={{ enter: 'ease-in', exit: 'ease-out' }}
+      easing={{ enter: "ease-in", exit: "ease-out" }}
     >
       <div>{alert && <Alert severity={alert.type}>{alert.message}</Alert>}</div>
     </Fade>
   );
 }
 
-
-function Layout( { children }) {
+function Layout({ children }) {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const theme = useTheme();
+  const isDesktop = useMediaQuery(theme.breakpoints.up("lg")); // 1280px and above
+
+  React.useEffect(() => {
+    setSidebarOpen(isDesktop);
+  }, [isDesktop]);
+
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  
+  const closeSidebar = () => {
+    setSidebarOpen(false);
+  };
 
   return (
     // <ThemeProvider theme={theme}>
     <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
       {/* Top Navbar */}
-      <Navbar toggleSidebar={toggleSidebar} />
+      <Navbar toggleSidebar={toggleSidebar} showToggle={!isDesktop} />
       <SuccessAlert message={"Hello How Are you"} />
       {/* Uncomment the Navbar component if you want to use it */}
-      <Box sx={{ display: "flex", flexGrow: 1 }}>
-        <Sidebar open={sidebarOpen} />
-        <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexGrow: 1,
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <Sidebar
+          open={sidebarOpen}
+          permanent={isDesktop}
+          onClose={closeSidebar}
+        />
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            p: 3,
+            width: "100%",
+            marginLeft: isDesktop ? "240px" : 0,
+            transition: theme.transitions.create(["margin"], {
+              easing: theme.transitions.easing.sharp,
+              duration: theme.transitions.duration.leavingScreen,
+            }),
+            position: "relative",
+            zIndex: 1,
+          }}
+        >
           {/* <Grid container spacing={2} alignItems="center">
               <Grid item xs={12} sm={4}>
                 <TextField
@@ -103,7 +135,7 @@ function Layout( { children }) {
                 </Button>
               </Grid>
             </Grid> */}
-            {children}
+          {children}
           {/* Table */}
           {/* <Box sx={{ marginTop: 4 }}>
               <TableContainer component={Paper} elevation={0}>
