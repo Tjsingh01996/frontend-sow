@@ -13,6 +13,10 @@ import {
   TableHead,
   TableRow,
   styled,
+  useMediaQuery,
+  useTheme,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import PrintIcon from "@mui/icons-material/Print";
@@ -20,6 +24,7 @@ import ToggleOnIcon from "@mui/icons-material/ToggleOn";
 import SearchIcon from "@mui/icons-material/Search";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
+import SaveIcon from "@mui/icons-material/Save";
 import Layout from "../Components/Layout/Layout";
 import { Api, getProductsList, UpdateProduct } from "../actions/product";
 import axios from "axios";
@@ -45,6 +50,13 @@ const ResponsiveButton = styled(Button)(({ theme }) => ({
   },
 }));
 
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  padding: "16px",
+  [theme.breakpoints.between("sm", "lg")]: {
+    padding: "8px", // Half the padding for screens between 768-1024px
+  },
+}));
+
 function ProductList() {
   const [products, setProducts] = React.useState({ rows: [] });
   const [page, setPage] = React.useState(1); // For pagination
@@ -54,6 +66,11 @@ function ProductList() {
   const [language, setLanguage] = React.useState(
     sessionStorage.getItem("lang") || "en"
   );
+
+  const theme = useTheme();
+  // Use exact 768px breakpoint instead of default Material UI breakpoints
+  const isMobile = useMediaQuery("(max-width:767px)"); // below 768px exactly
+  const isTablet = useMediaQuery("(min-width:768px) and (max-width:1023px)"); // 768px-1024px
 
   React.useEffect(() => {
     const fetchProducts = async () => {
@@ -145,22 +162,28 @@ function ProductList() {
             overflowY: "auto",
           }}
         >
-          <Table>
+          <Table size={isMobile || isTablet ? "small" : "medium"}>
             <TableHead>
               <TableRow>
-                <TableCell></TableCell>
-                <TableCell>{getText("articleNo")}</TableCell>
-                <TableCell>{getText("productService")}</TableCell>
-                <TableCell>{getText("price")}</TableCell>
-                <TableCell>{getText("inStock")}</TableCell>
-                <TableCell>{getText("unit")}</TableCell>
-                <TableCell>{getText("options")}</TableCell>
+                {!isMobile && <StyledTableCell></StyledTableCell>}
+                {!isMobile && (
+                  <StyledTableCell>{getText("articleNo")}</StyledTableCell>
+                )}
+                <StyledTableCell>{getText("productService")}</StyledTableCell>
+                <StyledTableCell>{getText("price")}</StyledTableCell>
+                {!isMobile && (
+                  <StyledTableCell>{getText("inStock")}</StyledTableCell>
+                )}
+                {!isMobile && (
+                  <StyledTableCell>{getText("unit")}</StyledTableCell>
+                )}
+                <StyledTableCell>{getText("options")}</StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {products.rows.length > 0 &&
                 products.rows.map((row, index) => (
-                  <ProductRow key={index} row={row} />
+                  <ProductRow key={index} row={row} isMobile={isMobile} />
                 ))}
             </TableBody>
           </Table>
@@ -182,10 +205,12 @@ function ProductList() {
   );
 }
 
-const ProductRow = ({ row }) => {
+const ProductRow = ({ row, isMobile }) => {
   const [formData, setFormData] = React.useState({ ...row });
   const { dispatch, state } = React.useContext(AppContext);
   const getText = getTranslationText(state, actionTypes.PRODUCT_LISTING);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({
@@ -202,25 +227,38 @@ const ProductRow = ({ row }) => {
       } else {
         console.log(result.message);
       }
+      handleClose(); // Close menu after saving
     } catch (error) {
       console.log(error);
     }
   };
 
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
     <>
       <TableRow>
-        <TableCell>
-          <ArrowRightAltIcon color="primary" />
-        </TableCell>
-        <TableCell>
-          <TextField
-            value={formData.article_no}
-            onChange={(e) => handleChange("article_no", e.target.value)}
-            size="small"
-            fullWidth
-          />
-        </TableCell>
+        {!isMobile && (
+          <TableCell>
+            <ArrowRightAltIcon color="primary" />
+          </TableCell>
+        )}
+        {!isMobile && (
+          <TableCell>
+            <TextField
+              value={formData.article_no}
+              onChange={(e) => handleChange("article_no", e.target.value)}
+              size="small"
+              fullWidth
+            />
+          </TableCell>
+        )}
         <TableCell>
           <TextField
             value={formData.description}
@@ -237,29 +275,48 @@ const ProductRow = ({ row }) => {
             fullWidth
           />
         </TableCell>
+        {!isMobile && (
+          <TableCell>
+            <TextField
+              value={formData.in_stock}
+              size="small"
+              onChange={(e) => handleChange("in_stock", e.target.value)}
+              fullWidth
+            />
+          </TableCell>
+        )}
+        {!isMobile && (
+          <TableCell>
+            <TextField
+              value={formData.unit}
+              onChange={(e) => handleChange("unit", e.target.value)}
+              size="small"
+              fullWidth
+            />
+          </TableCell>
+        )}
         <TableCell>
-          <TextField
-            value={formData.in_stock}
-            size="small"
-            onChange={(e) => handleChange("in_stock", e.target.value)}
-            fullWidth
-          />
-        </TableCell>
-        <TableCell>
-          <TextField
-            value={formData.unit}
-            onChange={(e) => handleChange("unit", e.target.value)}
-            size="small"
-            fullWidth
-          />
-        </TableCell>
-        <TableCell>
-          <IconButton size="small">
+          <IconButton size="small" onClick={handleMenuClick}>
             <MoreVertIcon />
           </IconButton>
-          <Button variant="contained" size="small" onClick={handleSave}>
-            {getText("save")}
-          </Button>
+          <Menu
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleClose}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "right",
+            }}
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+          >
+            <MenuItem onClick={handleSave}>
+              <SaveIcon fontSize="small" sx={{ mr: 1 }} />
+              {getText("save")}
+            </MenuItem>
+          </Menu>
         </TableCell>
       </TableRow>
     </>
