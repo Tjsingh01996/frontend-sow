@@ -5,6 +5,7 @@ import ProductList from "./Pages/ProductList";
 import Context from "./Contex";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import NoPage from "./Pages/NoPage";
+import TermsPage from "./Pages/TermPage";
 const AppContext  = createContext({
   alert:{
     severity:"",
@@ -19,6 +20,7 @@ function App() {
         <Router>
           <Routes>
             <Route path="/" element={<ProductList />} />
+             <Route path="/terms" element={<TermsPage />} />
             <Route path="/products" element={<ProductList />} />
             <Route path="*" element={<NoPage />} />
           </Routes>

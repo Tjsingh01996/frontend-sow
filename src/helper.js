@@ -3,4 +3,5 @@ export const actionTypes = {
   ALERT_ERROR: "ALERT_ERROR",
   ALERT_NULL: "ALERT_NULL",
   PRODUCT_LISTING: "productListing",
+  TERMS: "terms",
 };

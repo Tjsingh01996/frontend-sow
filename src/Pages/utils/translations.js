@@ -1,4 +1,5 @@
 export const getTranslationText = (state, page) => (key) => {
+   
   if (
     !(
       state.translation &&

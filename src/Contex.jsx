@@ -20,7 +20,12 @@ const reducer = (state, action) => {
             if(!(state.translation && state.translation.productListing)){
                 state.translation[actionTypes.PRODUCT_LISTING] = action.message
             };
-            return state;   
+            return {...state};   
+        case actionTypes.TERMS:
+            if(!(state.translation && state.translation[actionTypes.TERMS])){
+                state.translation[actionTypes.TERMS] = action.message
+            };
+            return {...state};  
         default:
             return state;
     }
