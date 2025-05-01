@@ -1,18 +1,22 @@
 import React from "react";
 import {
-    IconButton,
-    TextField,
-    Box,
-    Button,
-    Grid,
-    Paper,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    styled
+  IconButton,
+  TextField,
+  Box,
+  Button,
+  Grid,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  styled,
+  useMediaQuery,
+  useTheme,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import PrintIcon from "@mui/icons-material/Print";
@@ -20,6 +24,7 @@ import ToggleOnIcon from "@mui/icons-material/ToggleOn";
 import SearchIcon from "@mui/icons-material/Search";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
+import SaveIcon from "@mui/icons-material/Save";
 import Layout from "../Components/Layout/Layout";
 import { Api, getProductsList, UpdateProduct } from "../actions/product";
 import axios from "axios";
@@ -28,65 +33,77 @@ import { getTranslation } from "../actions/translations";
 import { actionTypes } from "../helper";
 import { getTranslationText } from "./utils/translations";
 
-
 const ResponsiveButton = styled(Button)(({ theme }) => ({
   borderRadius: 20,
-  padding: '8px 16px',
-  [theme.breakpoints.down('sm')]: {
-    padding: '8px', // smaller padding for mobile
-    justifyContent: 'center', // Center the icon on mobile
+  padding: "8px 16px",
+  [theme.breakpoints.down("sm")]: {
+    padding: "8px", // smaller padding for mobile
+    justifyContent: "center", // Center the icon on mobile
   },
-  '.button-text': {
-    [theme.breakpoints.down('md')]: {
-      display: 'none', // Hide text on mobile
-      
+  ".button-text": {
+    [theme.breakpoints.down("md")]: {
+      display: "none", // Hide text on mobile
     },
-    [theme.breakpoints.up('md')]: {
-      display: 'inline', // Show text from tablet and above
+    [theme.breakpoints.up("md")]: {
+      display: "inline", // Show text from tablet and above
     },
   },
 }));
 
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  padding: "16px",
+  [theme.breakpoints.between("sm", "lg")]: {
+    padding: "8px", // Half the padding for screens between 768-1024px
+  },
+}));
+
 function ProductList() {
-  const [products, setProducts] = React.useState({rows:[]});
-  const [page, setPage] = React.useState(1);  // For pagination
+  const [products, setProducts] = React.useState({ rows: [] });
+  const [page, setPage] = React.useState(1); // For pagination
   const [loading, setLoading] = React.useState(false);
-  const { dispatch, state } = React.useContext(AppContext); 
-  const getText = getTranslationText(state, actionTypes.PRODUCT_LISTING)
-  const [language, setLanguage] = React.useState(sessionStorage.getItem('lang') || 'en');
-  
+  const { dispatch, state } = React.useContext(AppContext);
+  const getText = getTranslationText(state, actionTypes.PRODUCT_LISTING);
+  const [language, setLanguage] = React.useState(
+    sessionStorage.getItem("lang") || "en"
+  );
+
+  const theme = useTheme();
+  // Use exact 768px breakpoint instead of default Material UI breakpoints
+  const isMobile = useMediaQuery("(max-width:767px)"); // below 768px exactly
+  const isTablet = useMediaQuery("(min-width:768px) and (max-width:1023px)"); // 768px-1024px
 
   React.useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
-      const response = await getProductsList(dispatch)(page);  // Call the API with current page
+      const response = await getProductsList(dispatch)(page); // Call the API with current page
       if (response.success) {
-        setProducts(response.result);  // Update state with the fetched products
+        setProducts(response.result); // Update state with the fetched products
       } else {
         console.error("Error fetching products:", response.message);
       }
       setLoading(false);
     };
-    getTranslation(dispatch, state)({page:actionTypes.PRODUCT_LISTING, lang: language})
-    
+    getTranslation(
+      dispatch,
+      state
+    )({ page: actionTypes.PRODUCT_LISTING, lang: language });
+
     fetchProducts();
-  }, [page]);  // Fetch products whenever the page changes
-  
-  const handleNextPage = () => setPage(prevPage => prevPage + 1);
-  const handlePrevPage = () => setPage(prevPage => Math.max(prevPage - 1, 1));
+  }, [page]); // Fetch products whenever the page changes
 
-    
+  const handleNextPage = () => setPage((prevPage) => prevPage + 1);
+  const handlePrevPage = () => setPage((prevPage) => Math.max(prevPage - 1, 1));
 
-//   const handleChange = (index, field, value) => {
-//     const updated = [...editedRows];
-//     updated[index][field] = value;
-//     setEditedRows(updated);
-//   };
+  //   const handleChange = (index, field, value) => {
+  //     const updated = [...editedRows];
+  //     updated[index][field] = value;
+  //     setEditedRows(updated);
+  //   };
 
   return (
     <Layout>
       <Grid container spacing={2} alignItems="center">
-        <Grid item  xs={12} sm={4}>
+        <Grid item xs={12} sm={4}>
           <TextField
             fullWidth
             placeholder={getText("searchArticleNo")}
@@ -99,7 +116,7 @@ function ProductList() {
         <Grid item xs={12} sm={4}>
           <TextField
             fullWidth
-            placeholder={getText("searchArticleNo")}
+            placeholder={getText("searchProduct")}
             size="small"
             InputProps={{
               endAdornment: <SearchIcon color="primary" />,
@@ -120,44 +137,67 @@ function ProductList() {
           >
             <span className="button-text">{getText("add")}</span>
           </ResponsiveButton>
-            <ResponsiveButton color="primary" variant="outlined" startIcon={<PrintIcon />}>
-                <span className="button-text">{getText("print")}</span>
-            </ResponsiveButton>
+          <ResponsiveButton
+            color="primary"
+            variant="outlined"
+            startIcon={<PrintIcon />}
+          >
+            <span className="button-text">{getText("print")}</span>
+          </ResponsiveButton>
           <ResponsiveButton
             variant="outlined"
             color="primary"
             startIcon={<ToggleOnIcon />}
           >
-             <span className="button-text">{getText("toggle")}</span>
+            <span className="button-text">{getText("toggle")}</span>
           </ResponsiveButton>
         </Grid>
       </Grid>
       <Box sx={{ marginTop: 4 }}>
-        <TableContainer component={Paper} elevation={0}   sx={{ 
-          maxHeight: 400, // or adjust height as needed
-          overflowY: 'auto' 
-        }}>
-          <Table>
+        <TableContainer
+          component={Paper}
+          elevation={0}
+          sx={{
+            maxHeight: 400, // or adjust height as needed
+            overflowY: "auto",
+          }}
+        >
+          <Table size={isMobile || isTablet ? "small" : "medium"}>
             <TableHead>
               <TableRow>
-                <TableCell></TableCell>
-                <TableCell>{getText("articleNo")}</TableCell>
-                <TableCell>{getText("productService")}</TableCell>
-                <TableCell>{getText("price")}</TableCell>
-                <TableCell>{getText("inStock")}</TableCell>
-                <TableCell>{getText("unit")}</TableCell>
-                <TableCell>{getText("options")}</TableCell>
+                {!isMobile && <StyledTableCell></StyledTableCell>}
+                {!isMobile && (
+                  <StyledTableCell>{getText("articleNo")}</StyledTableCell>
+                )}
+                <StyledTableCell>{getText("productService")}</StyledTableCell>
+                <StyledTableCell>{getText("price")}</StyledTableCell>
+                {!isMobile && (
+                  <StyledTableCell>{getText("inStock")}</StyledTableCell>
+                )}
+                {!isMobile && (
+                  <StyledTableCell>{getText("unit")}</StyledTableCell>
+                )}
+                <StyledTableCell>{getText("options")}</StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {products.rows.length >0 && products.rows.map((row, index) => (
-                <ProductRow key={index} row={row} />
-              ))}
+              {products.rows.length > 0 &&
+                products.rows.map((row, index) => (
+                  <ProductRow key={index} row={row} isMobile={isMobile} />
+                ))}
             </TableBody>
           </Table>
         </TableContainer>
-         <Box sx={{ marginTop: 2, display: 'flex', justifyContent: 'space-between' }}>
-          <Button disabled={page === 1} onClick={handlePrevPage}>{getText("previous")}</Button>
+        <Box
+          sx={{
+            marginTop: 2,
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+        >
+          <Button disabled={page === 1} onClick={handlePrevPage}>
+            {getText("previous")}
+          </Button>
           <Button onClick={handleNextPage}>{getText("next")}</Button>
         </Box>
       </Box>
@@ -165,14 +205,15 @@ function ProductList() {
   );
 }
 
-
-const ProductRow = ({row}) =>{
-    const [formData, setFormData] = React.useState({ ...row });
-    const { dispatch, state } = React.useContext(AppContext); 
-    const getText = getTranslationText(state, actionTypes.PRODUCT_LISTING)
+const ProductRow = ({ row, isMobile }) => {
+  const [formData, setFormData] = React.useState({ ...row });
+  const { dispatch, state } = React.useContext(AppContext);
+  const getText = getTranslationText(state, actionTypes.PRODUCT_LISTING);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
 
   const handleChange = (field, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
@@ -180,57 +221,106 @@ const ProductRow = ({row}) =>{
 
   const handleSave = async () => {
     try {
-         const result = await UpdateProduct(dispatch)(formData.id, formData)
-      if(result.success == true){
-        console.log("formData", formData)
-      }else{
-        console.log(result.message)
+      const result = await UpdateProduct(dispatch)(formData.id, formData);
+      if (result.success == true) {
+        console.log("formData", formData);
+      } else {
+        console.log(result.message);
       }
+      handleClose(); // Close menu after saving
     } catch (error) {
-            console.log(error)
+      console.log(error);
     }
-     
   };
 
-    return (
-        <>
-        <TableRow >
-                  <TableCell>
-                    <ArrowRightAltIcon color="primary" />
-                  </TableCell>
-                  <TableCell>
-                    <TextField value={formData.article_no} onChange={(e) => handleChange("article_no", e.target.value)} size="small" fullWidth />
-                  </TableCell>
-                  <TableCell>
-                    <TextField value={formData.description} onChange={(e) => handleChange("description", e.target.value)} size="small" fullWidth />
-                  </TableCell>
-                  <TableCell>
-                    <TextField value={formData.price} size="small" onChange={(e) => handleChange("price", e.target.value)} fullWidth />
-                  </TableCell>
-                  <TableCell>
-                    <TextField value={formData.in_stock} size="small"  onChange={(e) => handleChange("in_stock", e.target.value)} fullWidth />
-                  </TableCell>
-                  <TableCell>
-                    <TextField value={formData.unit} onChange={(e) => handleChange("unit", e.target.value)} size="small" fullWidth />
-                  </TableCell>
-                  <TableCell>
-                    <IconButton size="small">
-                      <MoreVertIcon />
-                    </IconButton>
-                    <Button
-                        variant="contained"
-                        size="small"
-                        onClick={handleSave}
-                    >
-                        {getText("save")}
-                    </Button>
-                  </TableCell>
-                </TableRow>
-        
-        </>
-    )
-}
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
 
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
+  return (
+    <>
+      <TableRow>
+        {!isMobile && (
+          <TableCell>
+            <ArrowRightAltIcon color="primary" />
+          </TableCell>
+        )}
+        {!isMobile && (
+          <TableCell>
+            <TextField
+              value={formData.article_no}
+              onChange={(e) => handleChange("article_no", e.target.value)}
+              size="small"
+              fullWidth
+            />
+          </TableCell>
+        )}
+        <TableCell>
+          <TextField
+            value={formData.description}
+            onChange={(e) => handleChange("description", e.target.value)}
+            size="small"
+            fullWidth
+          />
+        </TableCell>
+        <TableCell>
+          <TextField
+            value={formData.price}
+            size="small"
+            onChange={(e) => handleChange("price", e.target.value)}
+            fullWidth
+          />
+        </TableCell>
+        {!isMobile && (
+          <TableCell>
+            <TextField
+              value={formData.in_stock}
+              size="small"
+              onChange={(e) => handleChange("in_stock", e.target.value)}
+              fullWidth
+            />
+          </TableCell>
+        )}
+        {!isMobile && (
+          <TableCell>
+            <TextField
+              value={formData.unit}
+              onChange={(e) => handleChange("unit", e.target.value)}
+              size="small"
+              fullWidth
+            />
+          </TableCell>
+        )}
+        <TableCell>
+          <IconButton size="small" onClick={handleMenuClick}>
+            <MoreVertIcon />
+          </IconButton>
+          <Menu
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleClose}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "right",
+            }}
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+          >
+            <MenuItem onClick={handleSave}>
+              <SaveIcon fontSize="small" sx={{ mr: 1 }} />
+              {getText("save")}
+            </MenuItem>
+          </Menu>
+        </TableCell>
+      </TableRow>
+    </>
+  );
+};
 
 export default ProductList;
