@@ -197,7 +197,7 @@ function ProductList() {
           <Button disabled={page === 1} onClick={handlePrevPage}>
             {getText("previous")}
           </Button>
-          <Button onClick={handleNextPage}>{getText("next")}</Button>
+          <Button disabled={(products && products.rows.length === 0)} onClick={handleNextPage}>{getText("next")}</Button>
         </Box>
       </Box>
     </Layout>
@@ -269,6 +269,7 @@ const ProductRow = ({ row, isMobile }) => {
         <TableCell>
           <TextField
             value={formData.price}
+            type="number"
             size="small"
             onChange={(e) => handleChange("price", e.target.value)}
             fullWidth
@@ -279,6 +280,7 @@ const ProductRow = ({ row, isMobile }) => {
             <TextField
               value={formData.in_stock}
               size="small"
+              type="number"
               onChange={(e) => handleChange("in_stock", e.target.value)}
               fullWidth
             />
