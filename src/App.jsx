@@ -6,6 +6,7 @@ import Context from "./Contex";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import NoPage from "./Pages/NoPage";
 import TermsPage from "./Pages/TermPage";
+import "./App.css"
 const AppContext  = createContext({
   alert:{
     severity:"",
