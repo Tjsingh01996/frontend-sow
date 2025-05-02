@@ -67,17 +67,17 @@ const TermsPage = () => {
     )({ page: actionTypes.TERMS, lang: language });
   }, [language]);
 
-  return (
+  return (<>
+    <div class="background-container">
+          <img src="https://storage.123fakturera.se/public/wallpapers/sverige43.jpg" alt="" id="background-image" />
+    </div>
     <Box
       sx={{
         minHeight: "100vh",
-        backgroundImage:
-          "url('https://storage.123fakturera.se/public/wallpapers/sverige43.jpg')",
         backgroundSize: "cover",
         objectFit: "cover",
         backgroundAttachment: "fixed",
         textAlign: "center",
-        // backgroundPosition: "center",
       }}
     >
       {/* AppBar Header */}
@@ -255,6 +255,7 @@ const TermsPage = () => {
         </GoBackButton>
       </Typography>
     </Box>
+    </>
   );
 };
 

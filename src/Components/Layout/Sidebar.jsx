@@ -48,7 +48,7 @@ const Sidebar = ({ open, permanent = false, onClose }) => {
   const navigate = useNavigate()
   const pageForSideBar =
     Object.keys(state.translation).length > 0
-      ? Object.keys(state.translation)[0]
+      ? Object.keys(state.translation)[Object.keys(state.translation).length-1]
       : actionTypes.PRODUCT_LISTING;
   const getText = getTranslationText(state, pageForSideBar);
 
