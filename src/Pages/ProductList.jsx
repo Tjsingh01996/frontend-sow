@@ -67,7 +67,6 @@ function ProductList() {
     sessionStorage.getItem("lang") || "en"
   );
 
-  const theme = useTheme();
   // Use exact 768px breakpoint instead of default Material UI breakpoints
   const isMobile = useMediaQuery("(max-width:767px)"); // below 768px exactly
   const isTablet = useMediaQuery("(min-width:768px) and (max-width:1023px)"); // 768px-1024px
@@ -215,7 +214,7 @@ const ProductRow = ({ row, isMobile }) => {
   const handleChange = (field, value) => {
     setFormData((prev) => ({
       ...prev,
-      [field]: value,
+      [field]: value || null,
     }));
   };
 

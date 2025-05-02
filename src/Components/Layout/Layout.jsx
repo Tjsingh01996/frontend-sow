@@ -1,33 +1,22 @@
 import React from "react";
-import { Alert, Box, Fade, useMediaQuery, useTheme } from "@mui/material";
+import { Alert, Box, Fade, Snackbar, useMediaQuery, useTheme } from "@mui/material";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 import { AppContext } from "../../Contex";
 import { actionTypes } from "../../helper";
 
-function SuccessAlert({ message, severity = "success" }) {
+function SuccessAlert() {
   const {
     state: { alert },
     dispatch,
   } = React.useContext(AppContext);
-
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      dispatch({ type: actionTypes.ALERT_NULL });
-    }, 3000); // hides after 3 seconds
-
-    return () => clearTimeout(timer); // cleanup
-  }, [alert !== null]);
-
   return (
-    <Fade
-      in={!!alert}
-      appear={true}
-      timeout={{ enter: 1000, exit: 500 }}
-      easing={{ enter: "ease-in", exit: "ease-out" }}
-    >
-      <div>{alert && <Alert severity={alert.type}>{alert.message}</Alert>}</div>
-    </Fade>
+      <div>{alert && <Snackbar
+        anchorOrigin={{ vertical:"top", horizontal:"center" }}
+        open={!!alert}
+        onClose={()=>{dispatch({ type: actionTypes.ALERT_NULL });}}
+        autoHideDuration={4000}
+      ><Alert severity={alert.type}>{alert.message}</Alert></Snackbar>}</div>
   );
 }
 
@@ -53,7 +42,7 @@ function Layout({ children }) {
     <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
       {/* Top Navbar */}
       <Navbar toggleSidebar={toggleSidebar} showToggle={!isDesktop} />
-      <SuccessAlert message={"Hello How Are you"} />
+      <SuccessAlert />
       {/* Uncomment the Navbar component if you want to use it */}
       <Box
         sx={{
