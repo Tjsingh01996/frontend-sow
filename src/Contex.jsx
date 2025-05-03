@@ -17,14 +17,16 @@ const reducer = (state, action) => {
         case actionTypes.ALERT_NULL:
             return {...state, alert: null};
         case actionTypes.PRODUCT_LISTING:
-            if(!(state.translation && state.translation.productListing)){
-                state.translation[actionTypes.PRODUCT_LISTING] = action.message
+            if((state.translation && state.translation.productListing)){
+                delete state.translation.productListing
             };
+            state.translation[actionTypes.PRODUCT_LISTING] = action.message
             return {...state};   
         case actionTypes.TERMS:
-            if(!(state.translation && state.translation[actionTypes.TERMS])){
-                state.translation[actionTypes.TERMS] = action.message
+            if((state.translation && state.translation[actionTypes.TERMS])){
+               delete state.translation[actionTypes.TERMS]
             };
+            state.translation[actionTypes.TERMS] = action.message
             return {...state};  
         default:
             return state;

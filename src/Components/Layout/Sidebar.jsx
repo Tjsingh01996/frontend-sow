@@ -46,7 +46,7 @@ const menuItems = [
 const Sidebar = ({ open, permanent = false, onClose }) => {
   const { state } = React.useContext(AppContext);
   const navigate = useNavigate()
-  const pageForSideBar =
+  const pageForSideBar = 
     Object.keys(state.translation).length > 0
       ? Object.keys(state.translation)[Object.keys(state.translation).length-1]
       : actionTypes.PRODUCT_LISTING;
